@@ -1,6 +1,6 @@
 # pubspec-assist.nvim
 
-A neovim clone of [pubspec-assist](https://github.com/jeroen-meijer/pubspec-assist) a plugin for adding and updating dart dependencies in pubspec.yaml files.
+A clone of a neovim clone of [pubspec-assist](https://github.com/jeroen-meijer/pubspec-assist) a plugin for adding and updating dart dependencies in pubspec.yaml files.
 
 <img width="827" alt="Screen Shot 2022-03-20 at 21 24 28" src="https://user-images.githubusercontent.com/22454918/159186795-c26bd9e8-2476-430a-8c97-b051b1f9648e.png">
 
@@ -27,7 +27,7 @@ This plugin is in _alpha_ but should be stable enough for daily usage.
 
 ```lua
 use {
-  'akinsho/pubspec-assist.nvim',
+  'RyanCarrier/pubspec-assist.nvim',
   requires = 'plenary.nvim',
   config = function()
     require('pubspec-assist').setup()
@@ -35,8 +35,15 @@ use {
 }
 ```
 
+## Usage
+
+```lua
+  -- Jump to the latest version
+  vim.keymap.set("n", "<leader>pal", function() pa.set_latest_version() end);
+  -- Show the version picker
+  vim.keymap.set("n", "<leader>pap", function() pa.open_version_picker() end);
+```
+
 ## Contributing
 
-If you decide to use this plugin but want to see X feature implemented, then rather than making feature requests consider
-contributing PRs instead. I won't be taking a endless feature requests and the best way to see a feature want implemented
-is to contibute it yourself.
+Send PR or don't use

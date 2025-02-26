@@ -142,6 +142,10 @@ local function fetch(path, on_err, on_success)
         return on_err(result.body)
       end
       vim.schedule(function()
+        -- don't parse empty responses
+        if not result.body or result.body == "" then
+          return
+        end
         local data = vim.json.decode(result.body)
         if not data then
           return notify("No data returned for " .. path, L.ERROR, { title = PLUGIN_TITLE })
@@ -256,6 +260,26 @@ local function open_version_picker()
   end)
 end
 
+local function set_latest_version()
+  local line = fn.getline(".") --[[@as string]]
+  local lnum = unpack(api.nvim_win_get_cursor(0))
+  local package = parse_yaml(line)
+  if not package then
+    return
+  end
+  local package_name = vim.tbl_keys(package)[1]
+  local data = versions[api.nvim_get_current_buf()]
+  if not data or not data[package_name] then
+    return
+  end
+  local pkg_versions = fn.reverse(data[package_name].versions)
+  local latest = pkg_versions[1].version
+  if latest then
+    local separator = string.find(line, ":")
+    api.nvim_buf_set_text(0, lnum - 1, separator, lnum - 1, #line, { " ^" .. latest })
+  end
+end
+
 ---@param msg string[]
 ---@return string
 local function join_lines(msg)
@@ -340,10 +364,10 @@ local show_dependency_versions = async.void(function()
   local last_changed = api.nvim_buf_get_changedtick(buf_id)
   local cached_versions = versions[buf_id]
   if
-    last_changed
-    and cached_versions
-    and cached_versions.last_changed
-    and cached_versions.last_changed >= last_changed
+      last_changed
+      and cached_versions
+      and cached_versions.last_changed
+      and cached_versions.last_changed >= last_changed
   then
     return
   end
@@ -444,6 +468,16 @@ function M.setup(user_config)
       )
     end,
   })
+end
+
+-- set the latest version of the package
+function M.set_latest_version()
+  return set_latest_version()
+end
+
+-- open the version picker
+function M.open_version_picker()
+  return open_version_picker()
 end
 
 return M
